@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/chats_menu_item"
+        android:enabled="true"
+        android:icon="@drawable/messenger"
+        android:title="Messenger"/>
+
+    <item
+        android:id="@+id/profile_menu_item"
+        android:enabled="true"
+        android:icon="@drawable/user"
+        android:title="Profile"/>
+</menu>
