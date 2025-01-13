@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
+import android.net.wifi.WifiNetworkSpecifier
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.messenger.databinding.FragmentMainBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.net.NetworkInterface
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var binding: FragmentMainBinding
@@ -105,9 +107,18 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         requireContext().registerReceiver(receiver, intentFilter)
 
         val wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val connectionInfo: WifiInfo = wifiManager.connectionInfo
+        val connectionInfo = wifiManager.dhcpInfo
         val ipAddress = connectionInfo.ipAddress
         Log.d("WifiConnection", Formatter.formatIpAddress(ipAddress))
+        val interfaces = NetworkInterface.getNetworkInterfaces()
+        val list = interfaces.toList()
+        //go through the available interfaces
+        for (inf in list) {
+            if (inf.name.equals("wlan0")) {
+                //look into the interface's ipaddresses (ipv4,ipv6)
+                Log.d("WifiConnection new", inf.inetAddresses.toList()[0].hostAddress ?: "no connection")
+            }
+        }
     }
 
     override fun onResume() {
