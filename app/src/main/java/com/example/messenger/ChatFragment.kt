@@ -26,7 +26,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         val name = arguments?.getString("NAME") ?: "anonymous"
         val companionName = arguments?.getString("COMPANION_NAME") ?: "anonymous"
-        val avatarUrl = arguments?.getString("AVATAR_URL") ?: DEFAUL_AVATAR_URL
+        val avatarUrl = arguments?.getString("AVATAR_URL") ?: DEFAULT_AVATAR_URL
         val chatId = arguments?.getString("CHAT_ID") ?: "1"
 
         binding.chatToolbar.title = companionName

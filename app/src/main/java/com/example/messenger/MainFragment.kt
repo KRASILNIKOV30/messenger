@@ -22,14 +22,16 @@ import kotlinx.coroutines.flow.onEach
 class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var binding: FragmentMainBinding
     private lateinit var adapter: ChatAdapter
-    private val viewModel by lazy {
-        val provider = ViewModelProvider(owner = this)
-        provider[MainFragmentViewModel::class.java]
-    }
+    private lateinit var viewModel: MainFragmentViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requestPermissionsIfNeeded()
         super.onViewCreated(view, savedInstanceState)
+
+        val dao = StorageApp.db.messageItemDao()
+        val factory = MainFragmentViewModelFactory(dao)
+        viewModel = ViewModelProvider(this, factory)[MainFragmentViewModel::class.java]
+
         binding = FragmentMainBinding.bind(view)
         adapter = ChatAdapter {
             goToChat(it)

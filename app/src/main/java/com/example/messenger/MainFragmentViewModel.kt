@@ -1,6 +1,7 @@
 package com.example.messenger
 import android.view.MenuItem
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,5 +87,16 @@ class MainFragmentViewModel(
                 }
             ) }
         }
+    }
+}
+
+class MainFragmentViewModelFactory(
+    private val dao: MessageItemDao,
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
+            return MainFragmentViewModel(dao) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
