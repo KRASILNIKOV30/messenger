@@ -30,7 +30,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.messenger.databinding.FragmentMainBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStream
+import java.io.PrintWriter
 import java.net.NetworkInterface
+import java.net.Socket
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var binding: FragmentMainBinding
@@ -121,6 +127,35 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
+    private fun connectToDeviceBySocket(ipAddress: String, port: Int) {
+        Thread {
+            try {
+                // Создаем сокет и подключаемся к устройству
+                val socket = Socket(ipAddress, port)
+                Log.d("Socket", "Подключение установлено с $ipAddress на порт $port")
+
+                // Получаем потоки ввода и вывода
+                val outputStream: OutputStream = socket.getOutputStream()
+                val writer = PrintWriter(outputStream, true)
+                writer.println("Привет, устройство!")
+
+                val inputStream: InputStream = socket.getInputStream()
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val response = reader.readLine()
+                Log.d("Socket", "Ответ от устройства: $response")
+
+                // Закрытие сокета и потоков
+                reader.close()
+                writer.close()
+                socket.close()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("Socket", "Ошибка при подключении по сокету: ${e.message}")
+            }
+        }.start()
+    }
+
     override fun onResume() {
         super.onResume()
         // Создаем и регистрируем приемник
@@ -168,6 +203,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.addButtonInEmptyState.setOnClickListener {
             viewModel.onAddChat()
             startPeerDiscovery()
+            connectToDeviceBySocket("10.10.29.172", 8080)
         }
     }
 
