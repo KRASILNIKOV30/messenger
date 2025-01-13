@@ -116,45 +116,16 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         val wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
         val connectionInfo = wifiManager.dhcpInfo
         val ipAddress = connectionInfo.ipAddress
+        val ip = Formatter.formatIpAddress(ipAddress)
+        binding.profileIp.text = ip.toString()
         Log.d("WifiConnection", Formatter.formatIpAddress(ipAddress))
         val interfaces = NetworkInterface.getNetworkInterfaces()
         val list = interfaces.toList()
-        //go through the available interfaces
         for (inf in list) {
             if (inf.name.equals("wlan0")) {
-                //look into the interface's ipaddresses (ipv4,ipv6)
                 Log.d("WifiConnection new", inf.inetAddresses.toList()[0].hostAddress ?: "no connection")
             }
         }
-    }
-
-    private fun connectToDeviceBySocket(ipAddress: String, port: Int) {
-        Thread {
-            try {
-                // Создаем сокет и подключаемся к устройству
-                val socket = Socket(ipAddress, port)
-                Log.d("Socket", "Подключение установлено с $ipAddress на порт $port")
-
-                // Получаем потоки ввода и вывода
-                val outputStream: OutputStream = socket.getOutputStream()
-                val writer = PrintWriter(outputStream, true)
-                writer.println("Привет, устройство!")
-
-                val inputStream: InputStream = socket.getInputStream()
-                val reader = BufferedReader(InputStreamReader(inputStream))
-                val response = reader.readLine()
-                Log.d("Socket", "Ответ от устройства: $response")
-
-                // Закрытие сокета и потоков
-                reader.close()
-                writer.close()
-                socket.close()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e("Socket", "Ошибка при подключении по сокету: ${e.message}")
-            }
-        }.start()
     }
 
     override fun onResume() {
@@ -204,8 +175,38 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.addButtonInEmptyState.setOnClickListener {
             viewModel.onAddChat()
             startPeerDiscovery()
-            startServer(8080)
+            connectToDeviceBySocket("10.10.29.142", 8080)
+            // startServer(8080)
         }
+    }
+
+    private fun connectToDeviceBySocket(ipAddress: String, port: Int) {
+        Thread {
+            try {
+                // Создаем сокет и подключаемся к устройству
+                val socket = Socket(ipAddress, port)
+                Log.d("Socket", "Подключение установлено с $ipAddress на порт $port")
+
+                // Получаем потоки ввода и вывода
+                val outputStream: OutputStream = socket.getOutputStream()
+                val writer = PrintWriter(outputStream, true)
+                writer.println("Привет, устройство!")
+
+                val inputStream: InputStream = socket.getInputStream()
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val response = reader.readLine()
+                Log.d("Socket", "Ответ от устройства: $response")
+
+                // Закрытие сокета и потоков
+                reader.close()
+                writer.close()
+                socket.close()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("Socket", "Ошибка при подключении по сокету: ${e.message}")
+            }
+        }.start()
     }
 
     fun startServer(port: Int) {
