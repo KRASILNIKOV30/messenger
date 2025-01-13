@@ -26,7 +26,7 @@ class MessageAdapter: RecyclerView.Adapter<MessageViewHolder>() {
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val itemBinding = MessageItemBinding.bind(holder.itemView)
         val message = messageList[position]
-        val formattedTime = formatTimestamp(message.time)
+        val formattedTime = formatTimestamp(message.createdAt)
 
         itemBinding.senderMessage.isInvisible = !message.owned
         itemBinding.receiverMessage.isInvisible = message.owned

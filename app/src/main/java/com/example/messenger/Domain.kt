@@ -6,10 +6,3 @@ data class ChatItem(
     val name: String,
     val message: String,
 )
-
-data class MessageItem(
-    val chatId: String,
-    val text: String,
-    val time: Long,
-    val owned: Boolean,
-)
