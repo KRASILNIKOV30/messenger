@@ -23,16 +23,22 @@ abstract class AppDatabase : RoomDatabase() {
 
 data class ChatState(
     val messages: List<MessageItem> = listOf(),
+    val name: String,
 )
 
 class ChatViewModel(
     private val chatId: String,
+    private val name: String,
+    private val avatarUrl: String,
     private val dao: MessageItemDao,
 ): ViewModel() {
-    val state = MutableStateFlow(ChatState())
+    val state = MutableStateFlow(ChatState(name = name))
 
     init {
         loadChat()
+        P2PConnection(chatId, DEFAULT_PORT, name, avatarUrl) {
+            receiveMessage(it)
+        }
     }
 
     private fun loadChat() {
@@ -62,15 +68,33 @@ class ChatViewModel(
             ) }
         }
     }
+
+    private fun receiveMessage(message: String) {
+        viewModelScope.launch {
+            val messageItem = MessageItem(
+                uid = UUID.randomUUID().toString(),
+                chatId = chatId,
+                text = message,
+                createdAt = Instant.now().toEpochMilli(),
+                owned = false,
+            )
+            dao.insertAll(messageItem)
+            state.update { it.copy(
+                messages = it.messages + messageItem
+            ) }
+        }
+    }
 }
 
 class ChatViewModelFactory(
     private val chatId: String,
+    private val name: String,
+    private val avatarUrl: String,
     private val dao: MessageItemDao,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-            return ChatViewModel(chatId, dao) as T
+            return ChatViewModel(chatId, name, avatarUrl, dao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

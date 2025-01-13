@@ -25,12 +25,14 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         binding.messagesList.layoutManager = LinearLayoutManager(this.context)
 
         val name = arguments?.getString("NAME") ?: "anonymous"
+        val companionName = arguments?.getString("COMPANION_NAME") ?: "anonymous"
+        val avatarUrl = arguments?.getString("AVATAR_URL") ?: DEFAUL_AVATAR_URL
         val chatId = arguments?.getString("CHAT_ID") ?: "1"
 
-        binding.chatToolbar.title = name
+        binding.chatToolbar.title = companionName
 
         val dao = StorageApp.db.messageItemDao()
-        val factory = ChatViewModelFactory(chatId, dao)
+        val factory = ChatViewModelFactory(chatId, name, avatarUrl, dao)
         viewModel = ViewModelProvider(this, factory)[ChatViewModel::class.java]
 
         viewModel.state
