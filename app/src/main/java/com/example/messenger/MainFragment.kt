@@ -36,6 +36,7 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.NetworkInterface
+import java.net.ServerSocket
 import java.net.Socket
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -203,8 +204,46 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.addButtonInEmptyState.setOnClickListener {
             viewModel.onAddChat()
             startPeerDiscovery()
-            connectToDeviceBySocket("10.10.29.172", 8080)
+            startServer(8080)
         }
+    }
+
+    fun startServer(port: Int) {
+        Thread {
+            try {
+                // Создаем серверный сокет, который будет слушать на указанном порту
+                val serverSocket = ServerSocket(port)
+                Log.d("Server", "Сервер запущен и слушает на порту $port")
+
+                // Бесконечный цикл для обработки входящих соединений
+                while (true) {
+                    // Ожидаем соединения от клиента
+                    val clientSocket: Socket = serverSocket.accept()
+                    Log.d("Server", "Соединение принято от ${clientSocket.inetAddress.hostAddress}")
+
+                    // Получаем потоки ввода и вывода
+                    val inputStream = clientSocket.getInputStream()
+                    val reader = BufferedReader(InputStreamReader(inputStream))
+                    val messageFromClient = reader.readLine()  // Читаем сообщение от клиента
+
+                    Log.d("Server", "Получено сообщение от клиента: $messageFromClient")
+
+                    // Отправляем ответ клиенту
+                    val outputStream: OutputStream = clientSocket.getOutputStream()
+                    val writer = PrintWriter(outputStream, true)
+                    writer.println("Привет, клиент! Я получил ваше сообщение: '$messageFromClient'")
+
+                    // Закрытие потоков и сокета после обработки
+                    reader.close()
+                    writer.close()
+                    clientSocket.close()
+                    Log.d("Server", "Соединение с клиентом закрыто")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("Server", "Ошибка на сервере: ${e.message}")
+            }
+        }.start()
     }
 
     fun onWifiP2pStateChanged(state: Boolean) {
