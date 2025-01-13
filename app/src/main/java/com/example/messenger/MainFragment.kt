@@ -7,10 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.wifi.WifiInfo
+import android.net.wifi.WifiManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import android.os.Looper
+import android.text.format.Formatter
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -100,6 +103,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         channel = manager.initialize(requireContext(), Looper.getMainLooper(), null)
         receiver = WifiP2pBroadcastReceiver(this)
         requireContext().registerReceiver(receiver, intentFilter)
+
+        val wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val connectionInfo: WifiInfo = wifiManager.connectionInfo
+        val ipAddress = connectionInfo.ipAddress
+        Log.d("WifiConnection", Formatter.formatIpAddress(ipAddress))
     }
 
     override fun onResume() {
@@ -152,13 +160,24 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
-    fun onWifiP2pStateChanged(state: Boolean) {}
+    fun onWifiP2pStateChanged(state: Boolean) {
+        Log.d("PEERS", "wifi state changed")
+        Log.d("PEERS", state.toString())
+    }
 
-    fun onPeersChanged() {}
+    fun onPeersChanged() {
+        Log.d("PEERS", "peers changed")
+    }
 
-    fun onConnectionChanged(intent: Intent) {}
+    fun onConnectionChanged(intent: Intent) {
+        Log.d("PEERS", "connection changed")
+        Log.d("PEERS", intent.toString())
+    }
 
-    fun onDeviceChanged(intent: Intent) {}
+    fun onDeviceChanged(intent: Intent) {
+        Log.d("PEERS", "device changed")
+        Log.d("PEERS", intent.toString())
+    }
 
     /** Начать поиск доступных устройств через Wi-Fi Direct */
     @SuppressLint("MissingPermission")
