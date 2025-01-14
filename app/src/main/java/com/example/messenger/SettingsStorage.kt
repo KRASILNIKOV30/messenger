@@ -19,9 +19,23 @@ class SettingsStorage(
         }
     }
 
+    suspend fun saveChatName(chatId: String, name: String) {
+        val key = stringPreferencesKey(chatId)
+        context.dataStore.edit {
+            it[key] = name
+        }
+    }
+
     suspend fun saveAvatar(avatar: String) {
         context.dataStore.edit {
             it[avatarKey] = avatar
+        }
+    }
+
+    suspend fun saveChatAvatar(chatId: String, avatar: String) {
+        val key = stringPreferencesKey(chatId)
+        context.dataStore.edit {
+            it[key] = avatar
         }
     }
 
@@ -29,7 +43,17 @@ class SettingsStorage(
         return context.dataStore.data.firstOrNull()?.get(nameKey)
     }
 
+    suspend fun getChatName(chatId: String): String? {
+        val key = stringPreferencesKey(chatId)
+        return context.dataStore.data.firstOrNull()?.get(key)
+    }
+
     suspend fun getAvatar(): String? {
         return context.dataStore.data.firstOrNull()?.get(avatarKey)
+    }
+
+    suspend fun getChatAvatar(chatId: String): String? {
+        val key = stringPreferencesKey(chatId)
+        return context.dataStore.data.firstOrNull()?.get(key)
     }
 }

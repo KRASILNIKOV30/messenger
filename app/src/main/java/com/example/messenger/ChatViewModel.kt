@@ -29,10 +29,11 @@ data class ChatState(
 class ChatViewModel(
     private val chatId: String,
     private val name: String,
+    private val companionName: String,
     private val avatarUrl: String,
     private val dao: MessageItemDao,
 ): ViewModel() {
-    val state = MutableStateFlow(ChatState(name = name))
+    val state = MutableStateFlow(ChatState(name = companionName))
     private val client: P2PConnection
 
     init {
@@ -92,12 +93,13 @@ class ChatViewModel(
 class ChatViewModelFactory(
     private val chatId: String,
     private val name: String,
+    private val companionName: String,
     private val avatarUrl: String,
     private val dao: MessageItemDao,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-            return ChatViewModel(chatId, name, avatarUrl, dao) as T
+            return ChatViewModel(chatId, name, companionName, avatarUrl, dao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

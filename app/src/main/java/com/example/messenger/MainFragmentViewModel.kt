@@ -42,6 +42,10 @@ class MainFragmentViewModel(
 //        }
 //    }
 
+    init {
+        loadChats()
+    }
+
     fun onCreate() {
         viewModelScope.launch {
             val name = settingsStorage.getName() ?: DEFAULT_NAME
@@ -62,6 +66,23 @@ class MainFragmentViewModel(
             state.update { it.copy(
                 name = name
             ) }
+        }
+    }
+
+    fun loadChats() {
+        viewModelScope.launch {
+            val messages = dao.getAll()
+            var chats = mutableListOf<ChatItem>()
+            messages.forEach {
+                val name = settingsStorage.getChatName(it.chatId + NAME_POSTFIX) ?: DEFAULT_NAME
+                val avatarUrl = settingsStorage.getChatAvatar(it.chatId + AVATAR_POSTFIX) ?: DEFAULT_AVATAR_URL
+                val clientMessage = ClientMessage(
+                    message = it.text,
+                    name = name,
+                    avatarUrl = avatarUrl,
+                )
+                updateChats(it.chatId, clientMessage)
+            }
         }
     }
 
@@ -109,8 +130,6 @@ class MainFragmentViewModel(
         ) }
     }
 
-
-
     private fun receiveMessage(chatId: String, message: ClientMessage) {
         viewModelScope.launch {
             val messageItem = MessageItem(
@@ -126,27 +145,31 @@ class MainFragmentViewModel(
     }
 
     private fun updateChats(chatId: String, message: ClientMessage) {
-        val chat = state.value.chats.find { it.id == chatId }
-        if (chat == null) {
-            val newChat = ChatItem(
-                id = chatId,
-                name = message.name,
-                imageUrl = message.avatarUrl,
-                message = message.message
-            )
-            state.update { it.copy(
-                chats = it.chats + newChat
-            ) }
-        } else {
-            state.update { it.copy(
-                chats = it.chats.map { chat ->
-                    if (chat.id == chatId) {
-                        chat.copy(message = message.message)
-                    } else {
-                        chat
+        viewModelScope.launch {
+            settingsStorage.saveChatName(chatId + NAME_POSTFIX, message.name)
+            settingsStorage.saveChatAvatar(chatId + AVATAR_POSTFIX, message.avatarUrl)
+            val chat = state.value.chats.find { it.id == chatId }
+            if (chat == null) {
+                val newChat = ChatItem(
+                    id = chatId,
+                    name = message.name,
+                    imageUrl = message.avatarUrl,
+                    message = message.message
+                )
+                state.update { it.copy(
+                    chats = it.chats + newChat
+                ) }
+            } else {
+                state.update { it.copy(
+                    chats = it.chats.map { chat ->
+                        if (chat.id == chatId) {
+                            chat.copy(message = message.message)
+                        } else {
+                            chat
+                        }
                     }
-                }
-            ) }
+                ) }
+            }
         }
     }
 }

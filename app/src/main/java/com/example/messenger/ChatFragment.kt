@@ -30,7 +30,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         binding.chatToolbar.title = companionName
 
         val dao = StorageApp.db.messageItemDao()
-        val factory = ChatViewModelFactory(chatId, name, avatarUrl, dao)
+        val factory = ChatViewModelFactory(chatId, name, companionName, avatarUrl, dao)
         viewModel = ViewModelProvider(this, factory)[ChatViewModel::class.java]
 
         viewModel.state
