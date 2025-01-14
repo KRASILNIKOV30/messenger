@@ -67,6 +67,8 @@ class P2PConnection(
                 message = clientReader.readLine()
             }
 
+            clientWriter.println("Ответ")
+
             clientSocket?.close()
             clientReader.close()
             clientWriter.close()
