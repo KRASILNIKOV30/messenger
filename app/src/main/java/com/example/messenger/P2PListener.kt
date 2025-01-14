@@ -12,13 +12,14 @@ class P2PListener(
     private val messageHandler: (String, ClientMessage) -> Unit,
 ) {
     private var serverSocket: ServerSocket? = null
+    private var isRunning: Boolean = true
 
     init {
         thread(start = true) {
             try {
                 serverSocket = ServerSocket(port)
 
-                while (true) {
+                while (isRunning) {
                     val clientSocket = serverSocket?.accept()
                     thread(start = true) {
                         handleClient(clientSocket)
@@ -52,6 +53,7 @@ class P2PListener(
 
     fun stopListening() {
         try {
+            isRunning = false
             serverSocket?.close()
         } catch (e: Exception) {
             e.printStackTrace()
