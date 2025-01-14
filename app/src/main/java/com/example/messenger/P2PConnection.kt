@@ -1,5 +1,6 @@
 package com.example.messenger
 
+import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,7 +28,7 @@ class P2PConnection(
         thread(start = true) {
             try {
                 serverSocket = ServerSocket(port)
-                println("Server is listening on port $port")
+                Log.d("SERVER", "Server is listening on port $port")
 
                 while (isRunning) {
                     val clientSocket = serverSocket?.accept()
