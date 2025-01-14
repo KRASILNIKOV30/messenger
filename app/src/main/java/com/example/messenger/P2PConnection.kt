@@ -63,13 +63,6 @@ class P2PConnection(
             while (message != null) {
                 val clientMessage = Gson().fromJson(message, ClientMessage::class.java)
                 messageHandler(clientMessage.message)
-                val response = ClientMessage(
-                    message = "Ответ",
-                    name = name,
-                    avatarUrl = avatarUrl,
-                )
-                writer = clientWriter
-                reader = clientReader
             }
         } catch (e: Exception) {
             e.printStackTrace()
