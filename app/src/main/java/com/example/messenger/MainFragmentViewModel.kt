@@ -52,6 +52,10 @@ class MainFragmentViewModel(
         onCloseInput()
     }
 
+    fun onGoToChat() {
+        listener.stopListening()
+    }
+
     fun onAddCompanion() {
         state.update { it.copy(
             isInput = true,

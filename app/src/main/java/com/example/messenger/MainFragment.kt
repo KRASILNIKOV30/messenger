@@ -117,6 +117,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             putString("COMPANION_NAME", chat.name)
         }
 
+        viewModel.onGoToChat()
+
         findNavController()
             .navigate(R.id.action_mainFragment_to_chatFragment, arguments)
     }
