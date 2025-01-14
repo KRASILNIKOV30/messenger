@@ -76,13 +76,20 @@ class P2PConnection(
 
     suspend fun sendMessage(message: String) {
         withContext(Dispatchers.IO) {
+            val socket = Socket(ip, port)
+            val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+            val writer = PrintWriter(socket.getOutputStream(), true)
             val clientMessage = ClientMessage(
                 message = message,
                 name = name,
                 avatarUrl = avatarUrl,
             )
             val jsonMessage = Gson().toJson(clientMessage)
-            writer?.println(jsonMessage)
+            writer.println(jsonMessage)
+
+            reader.close()
+            writer.close()
+            socket.close()
         }
     }
 
