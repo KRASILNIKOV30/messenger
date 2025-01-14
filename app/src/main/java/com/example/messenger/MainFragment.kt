@@ -60,6 +60,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun render(state: State) {
+        binding.mainContainer.isInvisible = state.isInput
+        binding.inputContainer.isInvisible = !state.isInput
+
         if (state.isChatsSelected) {
             binding.toolbar.title = "Messenger"
             binding.emptyState.isInvisible = state.chats.isNotEmpty()
@@ -83,10 +86,18 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             return@setOnItemSelectedListener true
         }
         binding.addButton.setOnClickListener {
-            goToAddCompanion()
+            viewModel.onAddCompanion()
         }
         binding.addButtonInEmptyState.setOnClickListener {
-            goToAddCompanion()
+            viewModel.onAddCompanion()
+        }
+        binding.toolbarInput.setOnMenuItemClickListener {
+            val ip = binding.ipInput.text.toString()
+            viewModel.onCommitIp(ip)
+            return@setOnMenuItemClickListener true
+        }
+        binding.toolbarInput.setNavigationOnClickListener {
+            viewModel.onCloseInput()
         }
     }
 
@@ -108,11 +119,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         findNavController()
             .navigate(R.id.action_mainFragment_to_chatFragment, arguments)
-    }
-
-    private fun goToAddCompanion() {
-        findNavController()
-            .navigate(R.id.action_mainFragment_to_inputFragment)
     }
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 100

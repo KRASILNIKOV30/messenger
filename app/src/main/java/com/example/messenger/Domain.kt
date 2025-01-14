@@ -13,5 +13,7 @@ data class ClientMessage(
     val message: String,
 )
 
+const val DEFAULT_PORT = 8085
+
 const val DEFAULT_AVATAR_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTtKDBHoGq6L5htfFMFrluklPkLsQd4e3PAg&s"
 const val DEFAULT_NAME = "Guest295"

@@ -1,4 +1,5 @@
 package com.example.messenger
+import android.util.Log
 import android.view.MenuItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,13 +11,12 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
 
-const val DEFAULT_PORT = 8080
-
 data class State(
     val chats: List<ChatItem> = listOf(),
     val isChatsSelected: Boolean = true,
     val name: String = DEFAULT_NAME,
     val avatarUrl: String = DEFAULT_AVATAR_URL,
+    val isInput: Boolean = false,
 )
 
 sealed interface Event {
@@ -29,7 +29,11 @@ class MainFragmentViewModel(
     val state = MutableStateFlow(State())
     val event = MutableSharedFlow<Event>()
     val listener = P2PListener(DEFAULT_PORT) { chatId, message ->
-        updateChats(chatId, message)
+        receiveMessage(chatId, message)
+    }
+
+    init {
+        Log.d("VIEW_MODEL", "view model created")
     }
 
     fun onMenuItemReselected(item: MenuItem) {
@@ -39,15 +43,25 @@ class MainFragmentViewModel(
     }
 
     fun onCommitIp(ip: String) {
-        viewModelScope.launch {
-            val chat = ChatItem(
-                id = ip,
-                name = ip,
-                message = "",
-                imageUrl = DEFAULT_AVATAR_URL,
-            )
-            event.emit(Event.GoToChat(chat))
-        }
+        val message = ClientMessage(
+            name = ip,
+            avatarUrl = DEFAULT_AVATAR_URL,
+            message = "",
+        )
+        updateChats(ip, message)
+        onCloseInput()
+    }
+
+    fun onAddCompanion() {
+        state.update { it.copy(
+            isInput = true,
+        ) }
+    }
+
+    fun onCloseInput() {
+        state.update { it.copy(
+            isInput = false
+        ) }
     }
 
     private fun receiveMessage(chatId: String, message: ClientMessage) {
