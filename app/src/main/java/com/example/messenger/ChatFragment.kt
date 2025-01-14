@@ -46,6 +46,8 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         if (count != 0) {
             binding.messagesList.smoothScrollToPosition(count - 1)
         }
+
+        binding.chatToolbar.title = state.name
     }
 
     private fun initEventListeners() {
