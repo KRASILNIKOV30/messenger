@@ -1,6 +1,8 @@
 package com.example.messenger
 
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -32,14 +34,16 @@ class P2PConnection(
         }
     }
 
-    fun sendMessage(message: String) {
-        val clientMessage = ClientMessage(
-            message = message,
-            name = name,
-            avatarUrl = avatarUrl,
-        )
-        val jsonMessage = Gson().toJson(clientMessage)
-        writer?.println(jsonMessage)
+    suspend fun sendMessage(message: String) {
+        withContext(Dispatchers.IO) {
+            val clientMessage = ClientMessage(
+                message = message,
+                name = name,
+                avatarUrl = avatarUrl,
+            )
+            val jsonMessage = Gson().toJson(clientMessage)
+            writer?.println(jsonMessage)
+        }
     }
 
     private fun listenForMessages() {
