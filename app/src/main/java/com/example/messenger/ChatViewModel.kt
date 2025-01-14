@@ -71,18 +71,19 @@ class ChatViewModel(
         }
     }
 
-    private fun receiveMessage(message: String) {
+    private fun receiveMessage(message: ClientMessage) {
         viewModelScope.launch {
             val messageItem = MessageItem(
                 uid = UUID.randomUUID().toString(),
                 chatId = chatId,
-                text = message,
+                text = message.message,
                 createdAt = Instant.now().toEpochMilli(),
                 owned = false,
             )
             dao.insertAll(messageItem)
             state.update { it.copy(
-                messages = it.messages + messageItem
+                messages = it.messages + messageItem,
+                name = message.name
             ) }
         }
     }

@@ -16,7 +16,7 @@ class P2PConnection(
     private val port: Int,
     private val name: String,
     private val avatarUrl: String,
-    private val messageHandler: (String) -> Unit,
+    private val messageHandler: (ClientMessage) -> Unit,
 ) {
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
@@ -62,7 +62,7 @@ class P2PConnection(
             var message: String? = clientReader.readLine()
             while (message != null) {
                 val clientMessage = Gson().fromJson(message, ClientMessage::class.java)
-                messageHandler(clientMessage.message)
+                messageHandler(clientMessage)
                 message = clientReader.readLine()
             }
 
@@ -99,7 +99,7 @@ class P2PConnection(
                 val message = reader?.readLine()
                 message?.let {
                     val clientMessage = Gson().fromJson(it, ClientMessage::class.java)
-                    messageHandler(clientMessage.message)
+                    messageHandler(clientMessage)
                 }
             }
         } catch (e: Exception) {
