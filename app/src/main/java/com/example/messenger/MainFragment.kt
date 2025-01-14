@@ -116,6 +116,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             val url = binding.profileAvatarUrlInput.text.toString()
             viewModel.onChangeAvatar(url)
         }
+        binding.toolbar.setOnMenuItemClickListener {
+            viewModel.deleteAllMessages()
+            return@setOnMenuItemClickListener true
+        }
     }
 
     private fun handleEvents(event: Event) {

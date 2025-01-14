@@ -17,6 +17,7 @@ class P2PConnection(
     private val name: String,
     private val avatarUrl: String,
     private val messageHandler: (ClientMessage) -> Unit,
+    private val onError: (String) -> Unit,
 ) {
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
@@ -49,7 +50,7 @@ class P2PConnection(
 
                 listenForMessages()
             } catch (e: Exception) {
-                e.printStackTrace()
+                onError(e.toString())
             }
         }
     }

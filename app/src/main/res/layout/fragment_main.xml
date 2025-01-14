@@ -25,6 +25,7 @@
                 android:id="@+id/toolbar"
                 app:titleCentered="true"
                 app:title="Messenger"
+                app:menu="@menu/main_top_menu"
                 app:titleTextColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

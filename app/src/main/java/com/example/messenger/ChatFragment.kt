@@ -1,6 +1,7 @@
 package com.example.messenger
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +37,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         viewModel.state
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.event
+            .onEach { handleEvents(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         initEventListeners()
     }
 
@@ -60,6 +66,15 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         binding.chatToolbar.setNavigationOnClickListener {
             viewModel.onExit()
             findNavController().popBackStack()
+        }
+    }
+
+    private fun handleEvents(event: ChatEvent) {
+        when (event) {
+            ChatEvent.Error -> {
+                Toast.makeText(requireContext(), "Не удалось установить соединение", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
         }
     }
 }

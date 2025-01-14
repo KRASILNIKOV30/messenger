@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +27,10 @@ data class ChatState(
     val name: String,
 )
 
+sealed interface ChatEvent {
+    data object Error : ChatEvent
+}
+
 class ChatViewModel(
     private val chatId: String,
     private val name: String,
@@ -34,12 +39,15 @@ class ChatViewModel(
     private val dao: MessageItemDao,
 ): ViewModel() {
     val state = MutableStateFlow(ChatState(name = companionName))
+    val event = MutableSharedFlow<ChatEvent>()
     private val client: P2PConnection
 
     init {
         loadChat()
-        client = P2PConnection(chatId, DEFAULT_PORT, name, avatarUrl) {
-            receiveMessage(it)
+        client = P2PConnection(chatId, DEFAULT_PORT, name, avatarUrl, { receiveMessage(it) }) {
+            viewModelScope.launch {
+                event.emit(ChatEvent.Error)
+            }
         }
     }
 

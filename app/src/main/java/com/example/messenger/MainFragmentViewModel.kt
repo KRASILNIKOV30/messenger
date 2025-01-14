@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
+import kotlin.concurrent.thread
 
 data class State(
     val chats: List<ChatItem> = listOf(),
@@ -102,6 +103,16 @@ class MainFragmentViewModel(
         state.update { it.copy(
             isChatsSelected = item.itemId == R.id.chats_menu_item
         )}
+    }
+
+    fun deleteAllMessages() {
+        thread(start = true) {
+            val db = StorageApp.db
+            db.clearAllTables()
+            state.update { it.copy(
+                chats = listOf()
+            ) }
+        }
     }
 
     fun onCommitIp(ip: String) {
