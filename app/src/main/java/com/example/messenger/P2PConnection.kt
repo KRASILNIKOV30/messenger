@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
+import java.net.ServerSocket
 import java.net.Socket
 import kotlin.concurrent.thread
 
@@ -19,8 +20,26 @@ class P2PConnection(
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
     private var writer: PrintWriter? = null
+    private var serverSocket: ServerSocket? = null
+    private var isRunning = true
 
     init {
+        thread(start = true) {
+            try {
+                serverSocket = ServerSocket(port)
+                println("Server is listening on port $port")
+
+                while (isRunning) {
+                    val clientSocket = serverSocket?.accept()
+                    thread(start = true) {
+                        handleClient(clientSocket)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         thread(start = true) {
             try {
                 socket = Socket(ip, port)
@@ -31,6 +50,28 @@ class P2PConnection(
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    private fun handleClient(clientSocket: Socket?) {
+        try {
+            val clientReader = BufferedReader(InputStreamReader(clientSocket?.getInputStream()))
+            val clientWriter = PrintWriter(clientSocket?.getOutputStream(), true)
+
+            var message: String? = clientReader.readLine()
+            while (message != null) {
+                val clientMessage = Gson().fromJson(message, ClientMessage::class.java)
+                messageHandler(clientMessage.message)
+
+                message = clientReader.readLine()
+            }
+
+            clientSocket?.close()
+            clientReader.close()
+            clientWriter.close()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
