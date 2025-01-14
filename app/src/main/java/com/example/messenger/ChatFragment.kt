@@ -42,7 +42,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private fun render(state: ChatState) {
         adapter.messageList = state.messages
         adapter.notifyDataSetChanged()
-        binding.messagesList.smoothScrollToPosition(adapter.itemCount - 1)
+        val count = adapter.itemCount
+        if (count != 0) {
+            binding.messagesList.smoothScrollToPosition(count - 1)
+        }
     }
 
     private fun initEventListeners() {
