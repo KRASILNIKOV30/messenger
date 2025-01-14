@@ -59,10 +59,11 @@ class P2PConnection(
             val clientReader = BufferedReader(InputStreamReader(clientSocket?.getInputStream()))
             val clientWriter = PrintWriter(clientSocket?.getOutputStream(), true)
 
-            val message: String? = clientReader.readLine()
+            var message: String? = clientReader.readLine()
             while (message != null) {
                 val clientMessage = Gson().fromJson(message, ClientMessage::class.java)
                 messageHandler(clientMessage.message)
+                message = clientReader.readLine()
             }
 
             clientReader.close()
