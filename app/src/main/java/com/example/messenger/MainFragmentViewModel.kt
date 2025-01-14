@@ -163,7 +163,11 @@ class MainFragmentViewModel(
                 state.update { it.copy(
                     chats = it.chats.map { chat ->
                         if (chat.id == chatId) {
-                            chat.copy(message = message.message)
+                            chat.copy(
+                                message = message.message,
+                                name = message.name,
+                                imageUrl = message.avatarUrl,
+                            )
                         } else {
                             chat
                         }
