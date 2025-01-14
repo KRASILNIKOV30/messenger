@@ -1,5 +1,4 @@
 package com.example.messenger
-
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.messenger.databinding.FragmentChatBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 
 class ChatFragment : Fragment(R.layout.fragment_chat) {
     private lateinit var binding: FragmentChatBinding

@@ -33,10 +33,11 @@ class ChatViewModel(
     private val dao: MessageItemDao,
 ): ViewModel() {
     val state = MutableStateFlow(ChatState(name = name))
+    private val client: P2PConnection
 
     init {
         loadChat()
-        P2PConnection(chatId, DEFAULT_PORT, name, avatarUrl) {
+        client = P2PConnection(chatId, DEFAULT_PORT, name, avatarUrl) {
             receiveMessage(it)
         }
     }
@@ -66,6 +67,7 @@ class ChatViewModel(
             state.update { it.copy(
                 messages = it.messages + messageItem
             ) }
+            client.sendMessage(message)
         }
     }
 
