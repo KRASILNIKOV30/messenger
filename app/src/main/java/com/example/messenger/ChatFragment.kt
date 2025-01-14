@@ -47,6 +47,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private fun initEventListeners() {
         binding.sendButton.setOnClickListener {
             val message = binding.messageInput.text.toString()
+            binding.messageInput.setText("")
             viewModel.sendMessage(message)
         }
 
