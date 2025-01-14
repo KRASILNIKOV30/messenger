@@ -58,6 +58,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         }
 
         binding.chatToolbar.setNavigationOnClickListener {
+            viewModel.onExit()
             findNavController().popBackStack()
         }
     }

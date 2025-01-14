@@ -72,6 +72,10 @@ class ChatViewModel(
         }
     }
 
+    fun onExit() {
+        client.close()
+    }
+
     private fun receiveMessage(message: ClientMessage) {
         viewModelScope.launch {
             val messageItem = MessageItem(
