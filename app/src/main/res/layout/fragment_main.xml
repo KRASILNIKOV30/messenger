@@ -149,6 +149,52 @@
                 android:layout_marginTop="20dp"
                 android:textColor="@color/black" />
 
+            <EditText
+                android:id="@+id/profileNameInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Введите ваше имя"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/profileIp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/confirmNameButton"
+                android:layout_marginTop="60dp"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/confirmNameButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OK"
+                app:layout_constraintBottom_toBottomOf="@id/profileNameInput"
+                app:layout_constraintStart_toEndOf="@id/profileNameInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"/>
+
+            <EditText
+                android:id="@+id/profileAvatarUrlInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Введите ссылку на аватар"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/profileNameInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/confirmAvatarButton"
+                android:layout_marginTop="30dp"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/confirmAvatarButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OK"
+                app:layout_constraintBottom_toBottomOf="@id/profileAvatarUrlInput"
+                app:layout_constraintStart_toEndOf="@id/profileAvatarUrlInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navBottom"

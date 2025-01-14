@@ -1,6 +1,7 @@
 package com.example.messenger
-import android.util.Log
+import android.app.Application
 import android.view.MenuItem
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,10 +9,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.util.UUID
-import kotlin.concurrent.thread
 
 data class State(
     val chats: List<ChatItem> = listOf(),
@@ -26,13 +25,15 @@ sealed interface Event {
 }
 
 class MainFragmentViewModel(
+    application: Application,
     private val dao: MessageItemDao,
-) : ViewModel() {
+) : AndroidViewModel(application) {
     val state = MutableStateFlow(State())
     val event = MutableSharedFlow<Event>()
     val listener = P2PListener(DEFAULT_PORT) { chatId, message ->
         receiveMessage(chatId, message)
     }
+    private val settingsStorage = SettingsStorage(getApplication<Application>().applicationContext)
 
 //    init {
 //        val db = StorageApp.db
@@ -40,6 +41,41 @@ class MainFragmentViewModel(
 //            db.clearAllTables()
 //        }
 //    }
+
+    fun onCreate() {
+        viewModelScope.launch {
+            val name = settingsStorage.getName() ?: DEFAULT_NAME
+            val avatarUrl = settingsStorage.getAvatar() ?: DEFAULT_AVATAR_URL
+            state.update { it.copy(
+                name = name,
+                avatarUrl = avatarUrl
+            ) }
+        }
+    }
+
+    fun onChangeName(name: String) {
+        if (name.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            settingsStorage.saveName(name)
+            state.update { it.copy(
+                name = name
+            ) }
+        }
+    }
+
+    fun onChangeAvatar(avatarUrl: String) {
+        if (avatarUrl.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            settingsStorage.saveAvatar(avatarUrl)
+            state.update { it.copy(
+                avatarUrl = avatarUrl
+            ) }
+        }
+    }
 
     fun onMenuItemReselected(item: MenuItem) {
         state.update { it.copy(
@@ -72,6 +108,8 @@ class MainFragmentViewModel(
             isInput = false
         ) }
     }
+
+
 
     private fun receiveMessage(chatId: String, message: ClientMessage) {
         viewModelScope.launch {
@@ -114,11 +152,12 @@ class MainFragmentViewModel(
 }
 
 class MainFragmentViewModelFactory(
+    private val application: Application,
     private val dao: MessageItemDao,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
-            return MainFragmentViewModel(dao) as T
+            return MainFragmentViewModel(application, dao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

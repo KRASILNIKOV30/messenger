@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.messenger.databinding.FragmentMainBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,8 +29,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         requestPermissionsIfNeeded()
         super.onViewCreated(view, savedInstanceState)
 
+        val application = requireActivity().application
         val dao = StorageApp.db.messageItemDao()
-        val factory = MainFragmentViewModelFactory(dao)
+        val factory = MainFragmentViewModelFactory(application, dao)
         viewModel = ViewModelProvider(this, factory)[MainFragmentViewModel::class.java]
 
         binding = FragmentMainBinding.bind(view)
@@ -47,6 +49,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             .onEach { handleEvents(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.onCreate()
+
         initEventListeners()
 
         // TODO: сохранить ip во viewModel
@@ -62,13 +66,18 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun render(state: State) {
         binding.mainContainer.isInvisible = state.isInput
         binding.inputContainer.isInvisible = !state.isInput
+        binding.profileName.text = state.name
+        Glide
+            .with(this)
+            .load(state.avatarUrl)
+            .centerCrop()
+            .into(binding.profileAvatar)
 
         if (state.isChatsSelected) {
             binding.toolbar.title = "Messenger"
             binding.emptyState.isInvisible = state.chats.isNotEmpty()
             binding.chats.isInvisible = state.chats.isEmpty()
             binding.profile.isInvisible = true
-
             adapter.chatList = state.chats
             adapter.notifyDataSetChanged()
         }
@@ -98,6 +107,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
         binding.toolbarInput.setNavigationOnClickListener {
             viewModel.onCloseInput()
+        }
+        binding.confirmNameButton.setOnClickListener {
+            val name = binding.profileNameInput.text.toString()
+            viewModel.onChangeName(name)
+        }
+        binding.confirmAvatarButton.setOnClickListener {
+            val url = binding.profileAvatarUrlInput.text.toString()
+            viewModel.onChangeAvatar(url)
         }
     }
 
