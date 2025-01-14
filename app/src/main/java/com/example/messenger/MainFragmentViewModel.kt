@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.util.UUID
+import kotlin.concurrent.thread
 
 data class State(
     val chats: List<ChatItem> = listOf(),
@@ -33,6 +35,11 @@ class MainFragmentViewModel(
     }
 
     init {
+        val db = StorageApp.db
+        thread(start = true) {
+            db.clearAllTables()
+        }
+
         Log.d("VIEW_MODEL", "view model created")
     }
 
