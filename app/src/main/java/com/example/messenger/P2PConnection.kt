@@ -68,14 +68,9 @@ class P2PConnection(
                     name = name,
                     avatarUrl = avatarUrl,
                 )
-                clientWriter.println(Gson().toJson(response))
-                message = clientReader.readLine()
+                writer = clientWriter
+                reader = clientReader
             }
-
-            clientSocket?.close()
-            clientReader.close()
-            clientWriter.close()
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
