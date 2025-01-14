@@ -34,15 +34,6 @@ class MainFragmentViewModel(
         receiveMessage(chatId, message)
     }
 
-    init {
-        val db = StorageApp.db
-        thread(start = true) {
-            db.clearAllTables()
-        }
-
-        Log.d("VIEW_MODEL", "view model created")
-    }
-
     fun onMenuItemReselected(item: MenuItem) {
         state.update { it.copy(
             isChatsSelected = item.itemId == R.id.chats_menu_item
